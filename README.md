@@ -3,7 +3,7 @@
 ### An End-to-End Machine Learning Project for Predicting Health Conditions using Scikit-learn and Streamlit
 
 <p align="center">
-  <img src="recommendation.gif" alt="Project Demo" width="100%">
+  <img src="health_prediction.gif" alt="Project Demo" width="100%">
 </p>
 
 <p align="center">
