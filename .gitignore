@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+.agents/
+.codex/
+.git/
+.gitrepo/
+
+.streamlit/secrets.toml
+.env

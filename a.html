@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jack Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" data-type="module" data-presets="typescript,react">
+import React, { useState, useEffect, useRef, useMemo } from 'https://esm.sh/react@18.2.0';
+import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
+import { 
+  motion, 
+  AnimatePresence, 
+  useScroll, 
+  useTransform, 
+  useSpring,
+  motionValue,
+  useMotionValue
+} from 'https://esm.sh/framer-motion@11.18.2';
+import { 
+  ArrowUpRight, 
+  X, 
+  Send, 
+  Check, 
+  Mail, 
+  Github, 
+  Linkedin, 
+  Globe, 
+  Sparkles,
+  Layers,
+  ChevronDown
+} from 'https://esm.sh/lucide-react@0.468.0';
+
+// --- STYLES & GOOGLE FONTS INJECTION ---
+const fontStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+  
+  html, body, #root {
+    background-color: #0C0C0C;
+    font-family: 'Kanit', sans-serif;
+    color: #D7E2EA;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+  
+  .hero-heading {
+    background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0C0C0C;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #252627;
+    border-radius: 5px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3A3B3C;
+  }
+`;
+
+// --- DATA DEFINITIONS ---
+
+const MARQUEE_IMAGES = [
+  "https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif",
+  "https://motionsites.ai/assets/hero-codenest-preview-Cgppc2qV.gif",
+  "https://motionsites.ai/assets/hero-vex-ventures-preview-BczMFIiw.gif",
+  "https://motionsites.ai/assets/hero-stellar-ai-v2-preview-DjvxjG3C.gif",
+  "https://motionsites.ai/assets/hero-asme-preview-B_nGDnTP.gif",
+  "https://motionsites.ai/assets/hero-transform-data-preview-Cx5OU29N.gif",
+  "https://motionsites.ai/assets/hero-vitara-preview-Cjz2QYyU.gif",
+  "https://motionsites.ai/assets/hero-terra-preview-BFjrCr7T.gif",
+  "https://motionsites.ai/assets/hero-skyelite-preview-DHaZIgUv.gif",
+  "https://motionsites.ai/assets/hero-aethera-preview-DknSlcTa.gif",
+  "https://motionsites.ai/assets/hero-designpro-preview-D8c5_een.gif",
+  "https://motionsites.ai/assets/hero-stellar-ai-preview-D3HL6bw1.gif",
+  "https://motionsites.ai/assets/hero-xportfolio-preview-D4A8maiC.gif",
+  "https://motionsites.ai/assets/hero-orbit-web3-preview-BXt4OttD.gif",
+  "https://motionsites.ai/assets/hero-nexora-preview-cx5HmUgo.gif",
+  "https://motionsites.ai/assets/hero-evr-ventures-preview-DZxeVFEX.gif",
+  "https://motionsites.ai/assets/hero-planet-orbit-preview-DWAP8Z1P.gif",
+  "https://motionsites.ai/assets/hero-new-era-preview-CocuDUm9.gif",
+  "https://motionsites.ai/assets/hero-wealth-preview-B70idl_u.gif",
+  "https://motionsites.ai/assets/hero-luminex-preview-CxOP7ce6.gif",
+  "https://motionsites.ai/assets/hero-celestia-preview-0yO3jXO8.gif"
+];
+
+const SERVICES_DATA = [
+  {
+    id: "01",
+    title: "3D Modeling",
+    description: "Creation of detailed objects, characters, or environments tailored to specific client needs, ideal for games, products, and visualizations."
+  },
+  {
+    id: "02",
+    title: "Rendering",
+    description: "High-quality, photorealistic renders that showcase designs with custom lighting, textures, and materials to bring concepts to life."
+  },
+  {
+    id: "03",
+    title: "Motion Design",
+    description: "Dynamic animations and motion graphics that add energy and storytelling to brands, products, and digital experiences."
+  },
+  {
+    id: "04",
+    title: "Branding",
+    description: "Crafting cohesive visual identities -- from logos to full brand systems -- that communicate a clear and memorable presence."
+  },
+  {
+    id: "05",
+    title: "Web Design",
+    description: "Designing clean, modern, and conversion-focused websites with attention to layout, typography, and user experience."
+  }
+];
+
+const PROJECTS_DATA = [
+  {
+    id: "01",
+    name: "Nextlevel Studio",
+    category: "Client Project",
+    liveUrl: "https://nextlevel.studio",
+    col1Img1: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055344_5eff02e0-87a5-41ce-b64f-eb08da8f33db.png&w=1280&q=85",
+    col1Img2: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055431_11d841fd-8b41-46a5-82e4-b04f2407a7d8.png&w=1280&q=85",
+    col2Img: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055451_e317bf2d-28d4-48cc-86b0-6f72f25b6327.png&w=1280&q=85"
+  },
+  {
+    id: "02",
+    name: "Aura Brand Identity",
+    category: "Personal Brand",
+    liveUrl: "https://aura.design",
+    col1Img1: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055654_911201c5-36d9-4bc6-bac7-331adfce159f.png&w=1280&q=85",
+    col1Img2: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055723_5ceda0b8-d9c2-4665-b2e3-83ba19ba76d1.png&w=1280&q=85",
+    col2Img: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055753_adc5dcbd-a8e6-49c0-b43a-9b030d835cea.png&w=1280&q=85"
+  },
+  {
+    id: "03",
+    name: "Solaris Digital",
+    category: "Client Project",
+    liveUrl: "https://solaris.agency",
+    col1Img1: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055759_963cfb0b-4bd1-4b0f-9d0a-09bd6cf95b2f.png&w=1280&q=85",
+    col1Img2: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_060108_438f781a-9846-4dcc-89ab-c4e6cb830f5b.png&w=1280&q=85",
+    col2Img: "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055818_9d062121-ad7e-46b9-999a-1a6a692ef1ee.png&w=1280&q=85"
+  }
+];
+
+// --- REUSABLE HELPER COMPONENTS ---
+
+// 1. Contact Button (Dynamic color premium gradient with inner-shadow highlight styles)
+interface ContactButtonProps {
+  onClick?: () => void;
+  className?: string;
+}
+const ContactButton: React.FC<ContactButtonProps> = ({ onClick, className = "" }) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`relative rounded-full font-medium uppercase tracking-widest text-white transition-all duration-300 hover:scale-105 active:scale-95 ${className}`}
+      style={{
+        background: 'linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%)',
+        boxShadow: '0px 4px 15px rgba(181, 1, 167, 0.4), inset 4px 4px 12px #7721B1',
+        outline: '2px solid rgba(255, 255, 255, 0.8)',
+        outlineOffset: '-3px'
+      }}
+    >
+      <span className="flex items-center justify-center gap-2">
+        <span>Contact Me</span>
+        <ArrowUpRight className="w-4 h-4" />
+      </span>
+    </button>
+  );
+};
+
+// 2. Live Project Ghost Button
+interface LiveProjectButtonProps {
+  onClick?: () => void;
+  label?: string;
+  className?: string;
+}
+const LiveProjectButton: React.FC<LiveProjectButtonProps> = ({ onClick, label = "Live Project", className = "" }) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-full border-2 border-[#D7E2EA] px-8 py-3 text-sm font-medium uppercase tracking-widest text-[#D7E2EA] transition-all duration-200 hover:bg-[#D7E2EA]/10 hover:scale-105 active:scale-95 sm:px-10 sm:py-3.5 sm:text-base ${className}`}
+    >
+      <span className="flex items-center gap-2">
+        {label}
+        <ArrowUpRight className="w-4.5 h-4.5" />
+      </span>
+    </button>
+  );
+};
+
+// 3. Fade In Wrapper component with configurable viewport entrance attributes
+interface FadeInProps {
+  children: React.ReactNode;
+  delay?: number;
+  duration?: number;
+  x?: number;
+  y?: number;
+  className?: string;
+}
+const FadeIn: React.FC<FadeInProps> = ({ 
+  children, 
+  delay = 0, 
+  duration = 0.7, 
+  x = 0, 
+  y = 30, 
+  className = "" 
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x, y }}
+      whileInView={{ opacity: 1, x: 0, y: 0 }}
+      viewport={{ once: true, margin: "50px", amount: 0 }}
+      transition={{
+        delay,
+        duration,
+        ease: [0.25, 0.1, 0.25, 1]
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+// 4. Magnet Component (Mouse follow hover utility)
+interface MagnetProps {
+  children: React.ReactNode;
+  padding?: number;
+  strength?: number;
+  activeTransition?: string;
+  inactiveTransition?: string;
+  className?: string;
+}
+const Magnet: React.FC<MagnetProps> = ({
+  children,
+  padding = 150,
+  strength = 3,
+  activeTransition = "transform 0.3s ease-out",
+  inactiveTransition = "transform 0.6s ease-in-out",
+  className = ""
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [transform, setTransform] = useState("translate3d(0px, 0px, 0px)");
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const distanceX = e.clientX - centerX;
+    const distanceY = e.clientY - centerY;
+    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+    if (distance < padding) {
+      const moveX = distanceX / strength;
+      const moveY = distanceY / strength;
+      setTransform(`translate3d(${moveX}px, ${moveY}px, 0px) scale(1.05)`);
+      if (ref.current) {
+        ref.current.style.transition = activeTransition;
+      }
+    } else {
+      setTransform("translate3d(0px, 0px, 0px) scale(1)");
+      if (ref.current) {
+        ref.current.style.transition = inactiveTransition;
+      }
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setTransform("translate3d(0px, 0px, 0px) scale(1)");
+    if (ref.current) {
+      ref.current.style.transition = inactiveTransition;
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [padding, strength]);
+
+  return (
+    <div
+      ref={ref}
+      onMouseLeave={handleMouseLeave}
+      style={{ 
+        transform,
+        willChange: 'transform'
+      }}
+      className={`inline-block ${className}`}
+    >
+      {children}
+    </div>
+  );
+};
+
+// 5. Animated Character-by-Character text opacity scroller
+interface AnimatedTextProps {
+  text: string;
+  className?: string;
+}
+const AnimatedText: React.FC<AnimatedTextProps> = ({ text, className = "" }) => {
+  const containerRef = useRef<HTMLParagraphElement>(null);
+  
+  // Track scroll relative to character container
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start 0.8", "end 0.2"]
+  });
+
+  const words = useMemo(() => text.split(" "), [text]);
+  const chars = useMemo(() => {
+    let charIndex = 0;
+    return words.map((word) => {
+      const splitWord = word.split("").map((char) => ({
+        char,
+        globalIndex: charIndex++
+      }));
+      // Add a trailing space to maintain whitespace
+      splitWord.push({ char: " ", globalIndex: charIndex++ });
+      return splitWord;
+    });
+  }, [words]);
+
+  const totalCharsCount = useMemo(() => chars.flat().length, [chars]);
+
+  return (
+    <p ref={containerRef} className={`${className} flex flex-wrap justify-center`}>
+      {chars.map((word, wordIdx) => (
+        <span key={`word-${wordIdx}`} className="inline-flex whitespace-nowrap">
+          {word.map(({ char, globalIndex }) => {
+            // Determine scroll opacity mapping for this specific character
+            const startFraction = globalIndex / totalCharsCount;
+            const endFraction = (globalIndex + 1) / totalCharsCount;
+            
+            return (
+              <CharacterWrapper 
+                key={`char-${globalIndex}`} 
+                char={char} 
+                progress={scrollYProgress} 
+                range={[startFraction, endFraction]} 
+              />
+            );
+          })}
+        </span>
+      ))}
+    </p>
+  );
+};
+
+// Simple internal wrapper to handle character transform tracking individually
+interface CharacterWrapperProps {
+  char: string;
+  progress: any;
+  range: [number, number];
+}
+const CharacterWrapper: React.FC<CharacterWrapperProps> = ({ char, progress, range }) => {
+  const opacity = useTransform(progress, range, [0.2, 1.0]);
+  return (
+    <span className="relative inline-block">
+      {/* Invisible placeholder for layout layout flow */}
+      <span className="opacity-0">{char === " " ? "\u00A0" : char}</span>
+      <motion.span 
+        style={{ opacity }} 
+        className="absolute left-0 top-0 text-[#D7E2EA]"
+      >
+        {char === " " ? "\u00A0" : char}
+      </motion.span>
+    </span>
+  );
+};
+
+
+// --- CORE MAIN COMPONENT ---
+
+export default function App() {
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success'>('idle');
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+
+  // In-Memory state contact submit
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus('sending');
+    setTimeout(() => {
+      setFormStatus('success');
+      setTimeout(() => {
+        setIsContactOpen(false);
+        setFormStatus('idle');
+        setFormData({ name: '', email: '', message: '' });
+      }, 2000);
+    }, 1500);
+  };
+
+  // Inject Font and Global Reset Stylings dynamically
+  useEffect(() => {
+    const styleEl = document.createElement("style");
+    styleEl.innerHTML = fontStyles;
+    document.head.appendChild(styleEl);
+    return () => {
+      document.head.removeChild(styleEl);
+    };
+  }, []);
+
+  return (
+    <div className="relative min-h-screen overflow-x-hidden bg-[#0C0C0C] text-[#D7E2EA]">
+      
+      {/* --- HERO SECTION --- */}
+      <section id="hero" className="relative flex h-screen flex-col justify-between overflow-hidden px-6 pb-7 md:px-10 md:pb-10 pt-6 md:pt-8">
+        
+        {/* Navbar */}
+        <FadeIn delay={0} y={-20} className="z-20 w-full">
+          <nav className="flex w-full items-center justify-between">
+            <a href="#" className="font-extrabold tracking-widest text-white text-base md:text-xl lg:text-2xl hover:opacity-80 transition-opacity">
+              JACK<span className="text-purple-500 font-black">.</span>
+            </a>
+            <div className="flex items-center gap-4 sm:gap-8 md:gap-12 lg:gap-16">
+              <a href="#about" className="text-xs sm:text-sm md:text-lg lg:text-[1.3rem] font-medium uppercase tracking-wider text-[#D7E2EA] transition-all duration-200 hover:opacity-70">
+                About
+              </a>
+              <a href="#services" className="text-xs sm:text-sm md:text-lg lg:text-[1.3rem] font-medium uppercase tracking-wider text-[#D7E2EA] transition-all duration-200 hover:opacity-70">
+                Services
+              </a>
+              <a href="#projects" className="text-xs sm:text-sm md:text-lg lg:text-[1.3rem] font-medium uppercase tracking-wider text-[#D7E2EA] transition-all duration-200 hover:opacity-70">
+                Projects
+              </a>
+              <button 
+                onClick={() => setIsContactOpen(true)}
+                className="text-xs sm:text-sm md:text-lg lg:text-[1.3rem] font-medium uppercase tracking-wider text-[#D7E2EA] transition-all duration-200 hover:opacity-70"
+              >
+                Contact
+              </button>
+            </div>
+          </nav>
+        </FadeIn>
+
+        {/* Hero Portrait - Magnetic Mouse Follow, Centered Absolutely */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+          <div className="pointer-events-auto mt-20 sm:mt-24 md:mt-0">
+            <FadeIn delay={0.6} y={30}>
+              <Magnet padding={160} strength={4.5}>
+                <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-[#18181A] to-[#0A0A0B] shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-white/5">
+                  <img
+                    src="https://shrug-person-78902957.figma.site/_components/v2/d24c01ad3a56fc65e942a1f501eb73db42d7cf9a/Rectangle_40443.81459862.png"
+                    alt="Jack Portrait"
+                    className="h-auto w-[240px] object-cover sm:w-[320px] md:w-[410px] lg:w-[480px] select-none pointer-events-none"
+                    onError={(e) => {
+                      // Fallback image source if CloudFront hits an iframe blocker
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800";
+                    }}
+                  />
+                  {/* Overlay gradient highlight */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0C0C0C]/40 to-transparent pointer-events-none" />
+                </div>
+              </Magnet>
+            </FadeIn>
+          </div>
+        </div>
+
+        {/* Big Typographic Heading */}
+        <div className="relative z-0 my-auto flex w-full flex-col justify-center overflow-hidden">
+          <FadeIn delay={0.15} y={40}>
+            <h1 className="hero-heading w-full text-center font-black uppercase leading-none tracking-tight whitespace-nowrap text-[13.5vw] sm:text-[14.5vw] md:text-[15.5vw] lg:text-[16.5vw] -mt-2 sm:-mt-4 md:-mt-8">
+              Hi, i&apos;m jack
+            </h1>
+          </FadeIn>
+        </div>
+
+        {/* Bottom Bar Details */}
+        <div className="relative z-20 flex w-full items-end justify-between pb-4 sm:pb-6 md:pb-8">
+          {/* Left Summary Block */}
+          <FadeIn delay={0.35} y={20}>
+            <p 
+              className="text-left font-light uppercase tracking-wide leading-snug text-[#D7E2EA]"
+              style={{ fontSize: "clamp(0.7rem, 1.35vw, 1.4rem)", maxWidth: "clamp(150px, 18vw, 300px)" }}
+            >
+              a 3d creator driven by crafting striking and unforgettable projects
+            </p>
+          </FadeIn>
+
+          {/* Right Action Call Button */}
+          <FadeIn delay={0.5} y={20}>
+            <ContactButton 
+              onClick={() => setIsContactOpen(true)} 
+              className="px-6 py-2.5 sm:px-9 sm:py-3.5 md:px-12 md:py-4 text-[10px] sm:text-xs md:text-sm"
+            />
+          </FadeIn>
+        </div>
+
+        {/* Floating background ambience */}
+        <div className="absolute -left-[10%] top-[20%] -z-10 h-[300px] w-[300px] rounded-full bg-indigo-500/10 blur-[120px]" />
+        <div className="absolute -right-[10%] bottom-[10%] -z-10 h-[350px] w-[350px] rounded-full bg-pink-500/5 blur-[140px]" />
+      </section>
+
+
+      {/* --- MARQUEE SECTION --- */}
+      <MarqueeSection />
+
+
+      {/* --- ABOUT SECTION --- */}
+      <section id="about" className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#0C0C0C] px-5 py-24 sm:px-8 md:px-10 lg:py-32">
+        
+        {/* Floating decorative elements with custom delay entry animations */}
+        
+        {/* Top-left: Moon icon */}
+        <div className="absolute left-[2%] top-[4%] sm:left-[3%] md:left-[5%] z-10 pointer-events-none">
+          <FadeIn delay={0.1} x={-80} y={0} duration={0.9}>
+            <img 
+              src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/moon_icon.11395d36.png" 
+              alt="3D Moon"
+              className="w-[100px] sm:w-[150px] md:w-[190px] lg:w-[220px] h-auto drop-shadow-[0_10px_30px_rgba(255,255,255,0.05)]"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          </FadeIn>
+        </div>
+
+        {/* Bottom-left: 3D object */}
+        <div className="absolute bottom-[4%] left-[2%] sm:left-[5%] md:left-[8%] z-10 pointer-events-none">
+          <FadeIn delay={0.25} x={-80} y={0} duration={0.9}>
+            <img 
+              src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/p59_1.4659672e.png" 
+              alt="3D abstract shape"
+              className="w-[90px] sm:w-[125px] md:w-[160px] lg:w-[190px] h-auto"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          </FadeIn>
+        </div>
+
+        {/* Top-right: Lego icon */}
+        <div className="absolute right-[2%] top-[4%] sm:right-[3%] md:right-[5%] z-10 pointer-events-none">
+          <FadeIn delay={0.15} x={80} y={0} duration={0.9}>
+            <img 
+              src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/lego_icon-1.703bb594.png" 
+              alt="3D Lego Block"
+              className="w-[100px] sm:w-[140px] md:w-[185px] lg:w-[215px] h-auto"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          </FadeIn>
+        </div>
+
+        {/* Bottom-right: 3D group */}
+        <div className="absolute bottom-[4%] right-[2%] sm:right-[5%] md:right-[8%] z-10 pointer-events-none">
+          <FadeIn delay={0.3} x={80} y={0} duration={0.9}>
+            <img 
+              src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/Group_134-1.2e04f3ce.png" 
+              alt="3D geometric block group"
+              className="w-[110px] sm:w-[150px] md:w-[195px] lg:w-[230px] h-auto"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          </FadeIn>
+        </div>
+
+        {/* Section Heading & Content Column */}
+        <div className="relative z-20 flex flex-col items-center text-center w-full max-w-4xl">
+          <FadeIn delay={0} y={40} className="mb-10 sm:mb-14 md:mb-16">
+            <h2 
+              className="hero-heading font-black uppercase leading-none tracking-tight"
+              style={{ fontSize: "clamp(3rem, 11vw, 145px)" }}
+            >
+              About me
+            </h2>
+          </FadeIn>
+
+          {/* Interactive Scroll-Driven Reveal Text */}
+          <div className="px-2 sm:px-4 md:px-0 mb-14 sm:mb-20 md:mb-24">
+            <AnimatedText 
+              text="With more than five years of experience in design, i focus on branding, web design, and user experience, i truly enjoy working with businesses that aim to stand out and present their best image. Let's build something incredible together!"
+              className="text-center font-medium leading-relaxed max-w-[620px] text-gray-400"
+              style={{ fontSize: "clamp(1.1rem, 2.2vw, 1.45rem)" }}
+            />
+          </div>
+
+          <FadeIn delay={0.4} y={20}>
+            <ContactButton 
+              onClick={() => setIsContactOpen(true)} 
+              className="px-10 py-3.5 sm:px-12 sm:py-4 md:px-16 md:py-5 text-xs sm:text-sm md:text-base shadow-2xl"
+            />
+          </FadeIn>
+        </div>
+
+        {/* Ambient subtle light leak */}
+        <div className="absolute left-1/2 top-1/2 -z-10 h-[450px] w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/5 blur-[160px] pointer-events-none" />
+      </section>
+
+
+      {/* --- SERVICES SECTION --- */}
+      <section id="services" className="relative z-20 bg-[#FFFFFF] px-5 py-24 text-[#0C0C0C] sm:px-8 md:px-10 md:py-32 rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px]">
+        
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-16 text-center sm:mb-20 md:mb-28">
+            <h2 
+              className="font-black uppercase leading-none tracking-tight text-[#0C0C0C]"
+              style={{ fontSize: "clamp(3.2rem, 11vw, 150px)" }}
+            >
+              Services
+            </h2>
+          </div>
+
+          {/* Service items vertical list */}
+          <div className="flex flex-col border-t border-[#0C0C0C]/15">
+            {SERVICES_DATA.map((service, idx) => (
+              <FadeIn 
+                key={service.id} 
+                delay={idx * 0.1} 
+                className="group relative flex flex-col items-start justify-between border-b border-[#0C0C0C]/15 py-8 transition-colors duration-300 hover:bg-[#0C0C0C]/[0.02] sm:py-10 md:flex-row md:items-center md:py-12"
+              >
+                {/* Horizontal row representation */}
+                <div className="flex items-baseline gap-4 sm:gap-8 md:gap-12">
+                  <span 
+                    className="font-black text-[#0C0C0C] opacity-100 transition-transform duration-300 group-hover:scale-105"
+                    style={{ fontSize: "clamp(2.5rem, 9vw, 115px)" }}
+                  >
+                    {service.id}
+                  </span>
+                  
+                  <div className="flex flex-col gap-2">
+                    <h3 
+                      className="font-bold uppercase text-[#0C0C0C] tracking-wide"
+                      style={{ fontSize: "clamp(1.2rem, 2.4vw, 2.2rem)" }}
+                    >
+                      {service.title}
+                    </h3>
+                    <p 
+                      className="max-w-2xl font-light leading-relaxed text-[#0C0C0C]/75"
+                      style={{ fontSize: "clamp(0.9rem, 1.6vw, 1.15rem)" }}
+                    >
+                      {service.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Corner decorative detail */}
+                <div className="mt-4 self-end rounded-full bg-[#0C0C0C] p-3 text-white transition-all duration-300 group-hover:rotate-45 group-hover:bg-purple-600 md:mt-0 md:self-center">
+                  <ArrowUpRight className="h-5 w-5" />
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* --- PROJECTS SECTION --- */}
+      {/* Pull up offset overlaying the services section */}
+      <section id="projects" className="relative z-30 bg-[#0C0C0C] px-5 py-20 pb-32 -mt-10 sm:-mt-12 md:-mt-14 rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] text-[#D7E2EA]">
+        
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-14 text-center sm:mb-20">
+            <h2 
+              className="hero-heading font-black uppercase leading-none tracking-tight"
+              style={{ fontSize: "clamp(3.2rem, 11vw, 150px)" }}
+            >
+              Project
+            </h2>
+          </div>
+
+          {/* Sticky Stacking Project Cards Container */}
+          <div className="flex flex-col gap-24 md:gap-32">
+            {PROJECTS_DATA.map((project, index) => {
+              return (
+                <ProjectCard 
+                  key={project.id} 
+                  project={project} 
+                  index={index} 
+                  total={PROJECTS_DATA.length}
+                  onContactClick={() => setIsContactOpen(true)}
+                />
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+
+      {/* --- FOOTER SECTION --- */}
+      <footer className="relative z-40 bg-[#060607] border-t border-white/5 py-16 px-6 text-center">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="text-left">
+            <h3 className="font-black text-2xl uppercase tracking-wider text-white">JACK<span className="text-purple-500">.</span></h3>
+            <p className="text-sm text-gray-500 mt-2 font-light">Crafting immersive visual narratives since 2021.</p>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <a href="#" className="p-3 bg-white/5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition-all">
+              <Github className="w-5 h-5" />
+            </a>
+            <a href="#" className="p-3 bg-white/5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition-all">
+              <Linkedin className="w-5 h-5" />
+            </a>
+            <a href="#" className="p-3 bg-white/5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition-all">
+              <Mail className="w-5 h-5" />
+            </a>
+          </div>
+
+          <div className="text-right">
+            <button 
+              onClick={() => setIsContactOpen(true)}
+              className="px-6 py-2 border border-white/10 hover:border-white/30 rounded-full text-xs font-semibold uppercase tracking-wider transition-all"
+            >
+              Hire Me
+            </button>
+            <p className="text-xs text-gray-600 mt-2">&copy; 2026 Jack. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+
+
+      {/* --- PREMIUM CUSTOM CONTACT MODAL --- */}
+      <AnimatePresence>
+        {isContactOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 30, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 30, opacity: 0 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="relative w-full max-w-xl overflow-hidden rounded-[2.5rem] bg-[#121214] p-8 md:p-10 text-[#D7E2EA] border border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.8)]"
+            >
+              
+              {/* Close Button */}
+              <button 
+                onClick={() => setIsContactOpen(false)}
+                className="absolute right-6 top-6 rounded-full bg-white/5 p-2 text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              {/* Form Content */}
+              {formStatus === 'success' ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="mb-6 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 p-4 shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                    <Check className="h-10 w-10 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold uppercase tracking-wider text-white">Message Dispatched!</h3>
+                  <p className="mt-2 text-sm text-gray-400">Thank you for reaching out. Jack will connect with you shortly.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleContactSubmit} className="flex flex-col gap-6">
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-widest text-purple-400">Collaboration</span>
+                    <h3 className="text-2xl md:text-3xl font-black uppercase text-white mt-1">Start a Project</h3>
+                    <p className="text-xs text-gray-400 mt-2">Describe your design goals, modeling requirements, or brand direction below.</p>
+                  </div>
+
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-semibold uppercase tracking-wider text-gray-400">Your Name</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        placeholder="John Doe"
+                        className="w-full rounded-xl bg-white/5 border border-white/10 p-3.5 text-sm text-white placeholder-gray-500 outline-none transition-all focus:border-purple-500 focus:bg-white/10"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-semibold uppercase tracking-wider text-gray-400">Email Address</label>
+                      <input 
+                        type="email" 
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        placeholder="john@example.com"
+                        className="w-full rounded-xl bg-white/5 border border-white/10 p-3.5 text-sm text-white placeholder-gray-500 outline-none transition-all focus:border-purple-500 focus:bg-white/10"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-semibold uppercase tracking-wider text-gray-400">Project Brief</label>
+                      <textarea 
+                        rows={4}
+                        required
+                        value={formData.message}
+                        onChange={(e) => setFormData({...formData, message: e.target.value})}
+                        placeholder="Tell me what you're building..."
+                        className="w-full rounded-xl bg-white/5 border border-white/10 p-3.5 text-sm text-white placeholder-gray-500 outline-none transition-all focus:border-purple-500 focus:bg-white/10 resize-none"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={formStatus === 'sending'}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 py-4 text-xs font-bold uppercase tracking-widest text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
+                  >
+                    {formStatus === 'sending' ? (
+                      <span>Transmitting...</span>
+                    ) : (
+                      <>
+                        <span>Submit Proposal</span>
+                        <Send className="h-4.5 w-4.5" />
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    </div>
+  );
+}
+
+
+// --- SUPPORTING MARQUEE ROW SECTION IMPLEMENTATION ---
+function MarqueeSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scrollYOffset, setScrollYOffset] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const sectionTop = rect.top + window.scrollY;
+      
+      // Calculate delta based on viewport scroll matching instructions
+      const offset = (window.scrollY - sectionTop + window.innerHeight) * 0.35;
+      setScrollYOffset(offset);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // Initial compute
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  // Split images array into 2 distinct rows as instructed
+  const row1Images = MARQUEE_IMAGES.slice(0, 11);
+  const row2Images = MARQUEE_IMAGES.slice(11);
+
+  // Triple images sequence to guarantee seamless loop visual scrolling
+  const tripledRow1 = [...row1Images, ...row1Images, ...row1Images];
+  const tripledRow2 = [...row2Images, ...row2Images, ...row2Images];
+
+  // Translations based on scroll computed limits
+  const row1Translation = scrollYOffset - 250;
+  const row2Translation = -(scrollYOffset - 250);
+
+  return (
+    <section 
+      ref={containerRef} 
+      className="relative overflow-hidden bg-[#0C0C0C] pt-24 pb-10 sm:pt-32 md:pt-40"
+    >
+      <div className="flex flex-col gap-4">
+        
+        {/* Row 1 - Translates RIGHT on Scroll */}
+        <div className="w-full overflow-hidden whitespace-nowrap py-1">
+          <div 
+            style={{ 
+              transform: `translateX(${row1Translation}px)`,
+              willChange: 'transform'
+            }}
+            className="flex gap-4 w-max transition-transform duration-100 ease-out"
+          >
+            {tripledRow1.map((url, i) => (
+              <div 
+                key={`r1-img-${i}`}
+                className="relative shrink-0 rounded-2xl overflow-hidden bg-[#18181B]"
+                style={{ width: '380px', height: '240px' }}
+              >
+                <img 
+                  src={url} 
+                  alt="Motion Graphics Loop" 
+                  loading="lazy"
+                  className="w-full h-full object-cover rounded-2xl opacity-80 hover:opacity-100 transition-opacity duration-300"
+                  onError={(e) => {
+                    // Failback random aesthetic design gradient
+                    e.currentTarget.src = `https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&q=80&w=600`;
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2 - Translates LEFT on Scroll */}
+        <div className="w-full overflow-hidden whitespace-nowrap py-1">
+          <div 
+            style={{ 
+              transform: `translateX(${row2Translation}px)`,
+              willChange: 'transform'
+            }}
+            className="flex gap-4 w-max transition-transform duration-100 ease-out"
+          >
+            {tripledRow2.map((url, i) => (
+              <div 
+                key={`r2-img-${i}`}
+                className="relative shrink-0 rounded-2xl overflow-hidden bg-[#18181B]"
+                style={{ width: '380px', height: '240px' }}
+              >
+                <img 
+                  src={url} 
+                  alt="Motion Design Preview" 
+                  loading="lazy"
+                  className="w-full h-full object-cover rounded-2xl opacity-80 hover:opacity-100 transition-opacity duration-300"
+                  onError={(e) => {
+                    e.currentTarget.src = `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600`;
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+
+// --- SUPPORTING STICKY PROJECT CARD PATTERN ---
+interface ProjectCardProps {
+  project: {
+    id: string;
+    name: string;
+    category: string;
+    liveUrl: string;
+    col1Img1: string;
+    col1Img2: string;
+    col2Img: string;
+  };
+  index: number;
+  total: number;
+  onContactClick: () => void;
+}
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, total, onContactClick }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Measure scroll metrics inside cards tracking space
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "start start"]
+  });
+
+  // Scale calculations: targetScale = 1 - (total - 1 - index) * 0.03
+  const targetScale = 1 - (total - 1 - index) * 0.03;
+  const scale = useTransform(scrollYProgress, [0.8, 1], [1, targetScale]);
+  
+  // Custom stacking offsets
+  const topOffset = index * 28;
+
+  return (
+    <div 
+      ref={cardRef} 
+      className="sticky top-24 md:top-32 w-full flex flex-col items-center justify-center z-10"
+      style={{ 
+        paddingTop: `${topOffset}px`,
+        minHeight: "75vh"
+      }}
+    >
+      <motion.div 
+        style={{ scale }}
+        className="w-full bg-[#0C0C0C] border-2 border-[#D7E2EA]/30 rounded-[40px] sm:rounded-[50px] md:rounded-[60px] p-6 sm:p-8 md:p-10 shadow-[0_30px_70px_rgba(0,0,0,0.9)] overflow-hidden"
+      >
+        {/* Card Header Content */}
+        <div className="flex flex-col gap-6 md:flex-row md:items-center justify-between border-b border-white/10 pb-8 mb-8">
+          <div className="flex items-center gap-4 md:gap-8">
+            <span className="font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white opacity-20">
+              {project.id}
+            </span>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-semibold uppercase tracking-widest text-purple-400">
+                {project.category}
+              </span>
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-wide uppercase">
+                {project.name}
+              </h3>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <LiveProjectButton onClick={onContactClick} label="Live Project" />
+          </div>
+        </div>
+
+        {/* 2-Column Responsive Image Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-10 gap-6">
+          
+          {/* Left Column (40% proportional width representation) */}
+          <div className="md:col-span-4 flex flex-col gap-6">
+            <div 
+              className="relative overflow-hidden rounded-[2.5rem] bg-[#18181B] border border-white/5 hover:scale-[1.02] transition-transform duration-300"
+              style={{ height: 'clamp(150px, 18vw, 240px)' }}
+            >
+              <img 
+                src={project.col1Img1} 
+                alt={`${project.name} interface view 1`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&q=80&w=800";
+                }}
+              />
+            </div>
+            
+            <div 
+              className="relative overflow-hidden rounded-[2.5rem] bg-[#18181B] border border-white/5 hover:scale-[1.02] transition-transform duration-300"
+              style={{ height: 'clamp(180px, 24vw, 320px)' }}
+            >
+              <img 
+                src={project.col1Img2} 
+                alt={`${project.name} interface view 2`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800";
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Right Column (60% proportional width representation) */}
+          <div className="md:col-span-6">
+            <div className="relative w-full h-full min-h-[300px] md:min-h-0 md:h-[calc(clamp(150px,18vw,240px)+clamp(180px,24vw,320px)+1.5rem)] rounded-[2.5rem] overflow-hidden bg-[#18181B] border border-white/5 hover:scale-[1.01] transition-transform duration-300">
+              <img 
+                src={project.col2Img} 
+                alt={`${project.name} main view`}
+                className="w-full h-full object-cover absolute inset-0"
+                onError={(e) => {
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800";
+                }}
+              />
+            </div>
+          </div>
+
+        </div>
+
+      </motion.div>
+    </div>
+  );
+};
+
+createRoot(document.getElementById('root')!).render(<App />);
+  </script>
+</body>
+</html>
