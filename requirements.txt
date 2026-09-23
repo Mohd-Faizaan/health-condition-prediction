@@ -1,3 +1,4 @@
-streamlit
+fastapi
 pandas
 scikit-learn
+uvicorn
