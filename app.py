@@ -75,4 +75,10 @@ def home():
 
 @app.post("/predict")
 def predict(data: PredictionInput):
-    return {"prediction": predict_health(data.model_dump())}
+    try:
+        return {"prediction": predict_health(data.model_dump())}
+    except Exception as e:
+        return {"error": str(e)}
+# @app.post("/predict")
+# def predict(data: PredictionInput):
+#     return {"prediction": predict_health(data.model_dump())}
