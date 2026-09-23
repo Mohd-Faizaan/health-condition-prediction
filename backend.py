@@ -11,8 +11,8 @@ import pandas as pd
 from numpy.random import _pickle as numpy_random_pickle
 
 BASE_DIR = Path(__file__).resolve().parent
-MODEL_PATH = BASE_DIR / "model.pkl"
-SCALER_PATH = BASE_DIR / "scaler.pkl"
+MODEL_PATH = Path("/tmp/model.pkl")
+SCALER_PATH = Path("/tmp/scaler.pkl")
 
 MODEL_URL = "https://media.githubusercontent.com/media/Mohd-Faizaan/health-condition-prediction/main/model.pkl"
 SCALER_URL = "https://media.githubusercontent.com/media/Mohd-Faizaan/health-condition-prediction/main/scaler.pkl"
