@@ -11,11 +11,11 @@ import pandas as pd
 from numpy.random import _pickle as numpy_random_pickle
 
 BASE_DIR = Path(__file__).resolve().parent
-MODEL_PATH = Path("/tmp/model.pkl")
-SCALER_PATH = Path("/tmp/scaler.pkl")
+MODEL_PATH = BASE_DIR / "model.pkl"
+SCALER_PATH = BASE_DIR / "scaler.pkl"
 
-MODEL_URL = "https://media.githubusercontent.com/media/Mohd-Faizaan/health-condition-prediction/main/model.pkl"
-SCALER_URL = "https://media.githubusercontent.com/media/Mohd-Faizaan/health-condition-prediction/main/scaler.pkl"
+#MODEL_URL = "https://media.githubusercontent.com/media/Mohd-Faizaan/health-condition-prediction/main/model.pkl"
+#SCALER_URL = "https://media.githubusercontent.com/media/Mohd-Faizaan/health-condition-prediction/main/scaler.pkl"
 
 FEATURE_ORDER = (
     "sleep_duration", "heart_rate", "bmi", "calorie_expenditure",
@@ -54,8 +54,10 @@ def _download_if_missing(path: Path, url: str) -> None:
             tmp.unlink(missing_ok=True)
 
 def _ensure_artifacts() -> None:
-    _download_if_missing(MODEL_PATH, MODEL_URL)
-    _download_if_missing(SCALER_PATH, SCALER_URL)
+    if not MODEL_PATH.exists():
+        raise FileNotFoundError("model.pkl not found")
+    if not SCALER_PATH.exists():
+        raise FileNotFoundError("scaler.pkl not found")
 
 @lru_cache(maxsize=1)
 def _load_model() -> Any:
