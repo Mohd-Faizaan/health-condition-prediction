@@ -63,7 +63,10 @@ form.addEventListener("submit",async e=>{
  for(const k of ["sleep_duration","heart_rate","bmi","calorie_expenditure","step_count","exercise_duration","water_intake"])data[k]=Number(data[k]);
  try{const r=await fetch("/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
  const j=await r.json();if(!r.ok)throw new Error(j.detail||"Prediction failed");
- result.textContent="Prediction: "+j.prediction;
+ if (j.error) {
+    throw new Error(j.error);
+}
+result.textContent="Prediction: "+j.prediction;
  }catch(err){result.textContent="Error: "+err.message}
 });
 </script></body></html>
