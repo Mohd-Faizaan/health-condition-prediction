@@ -61,7 +61,7 @@ form.addEventListener("submit",async e=>{
  e.preventDefault();result.style.display="block";result.textContent="Analyzing...";
  const data=Object.fromEntries(new FormData(form).entries());
  for(const k of ["sleep_duration","heart_rate","bmi","calorie_expenditure","step_count","exercise_duration","water_intake"])data[k]=Number(data[k]);
- try{const r=await fetch("/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+ try{const r=await fetch("/api/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
  const j=await r.json();if(!r.ok)throw new Error(j.detail||"Prediction failed");
  if (j.error) {
     throw new Error(j.error);
