@@ -1,7 +1,8 @@
 """Model inference adapter for the Vercel Health Condition Prediction app."""
 from __future__ import annotations
 
-import pickle
+#import pickle
+import joblib
 import urllib.request
 from functools import lru_cache
 from pathlib import Path
@@ -70,7 +71,7 @@ def _load_model() -> Any:
     numpy_random_pickle.__bit_generator_ctor = compatible_bit_generator_constructor
     try:
         with MODEL_PATH.open("rb") as model_file:
-            model = pickle.load(model_file)
+            model = joblib.load(model_file)
     finally:
         numpy_random_pickle.__bit_generator_ctor = original_constructor
     actual_features = list(getattr(model, "feature_names_in_", FEATURE_ORDER))
@@ -82,7 +83,7 @@ def _load_model() -> Any:
 def _load_scaler() -> Any | None:
     _ensure_artifacts()
     with SCALER_PATH.open("rb") as scaler_file:
-        return pickle.load(scaler_file)
+        return joblib.load(scaler_file)
 
 def _apply_scaler(frame: pd.DataFrame) -> pd.DataFrame:
     scaler = _load_scaler()
